@@ -340,12 +340,34 @@
   });
 
   /* ---------- 选择时间 ---------- */
+  var SERVERCHAN_KEY = 'SCT416850TqvZ59jeyULOIyJSOrOVPiVtj'; // ← 换成 Server 酱的 SendKey
+
+  function sendFeedback(day) {
+    try {
+      var url = 'https://sctapi.ftqq.com/' + SERVERCHAN_KEY +
+                '.send?title=' + encodeURIComponent('她选了 ' + day) +
+                '&desp=' + encodeURIComponent('时间：' + new Date().toLocaleString('zh-CN'));
+      fetch(url, { mode: 'no-cors' }).catch(function () {});
+    } catch (e) {}
+  }
+
   document.querySelectorAll('[data-day]').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var day = btn.getAttribute('data-day');
       document.getElementById('finalDay').textContent = day;
       document.getElementById('finalSub').textContent = day + '见';
       show('stageDone');
+      sendFeedback(day);
+    });
+  });
+
+  document.querySelectorAll('[data-day]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var day = btn.getAttribute('data-day');
+      document.getElementById('finalDay').textContent = day;
+      document.getElementById('finalSub').textContent = day + '见';
+      show('stageDone');
+      sendFeedback(day);   // 发送反馈
     });
   });
 
