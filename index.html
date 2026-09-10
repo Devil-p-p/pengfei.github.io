@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffeef2" />
+<title>一个小邀请 · 愿意和我约会吗？</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    color: #3b3336;
+    background: linear-gradient(160deg, #fff1f4 0%, #ffe3ea 45%, #f2e9ff 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+  }
+
+  /* ---------- 背景漂浮的小图案 ---------- */
+  #hearts {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #hearts span {
+    position: absolute;
+    bottom: -60px;
+    color: #fff;
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    to { transform: translateY(-118vh) rotate(35deg); }
+  }
+
+  /* ---------- 卡片 ---------- */
+  .card {
+    position: relative;
+    z-index: 1;
+    width: min(430px, 100%);
+    padding: 46px 30px 40px;
+    text-align: center;
+    background: #fff;
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 24px 60px -22px rgba(214, 130, 150, 0.45),
+      0 4px 14px rgba(120, 90, 110, 0.06);
+  }
+
+  /* ---------- 两个画面 ---------- */
+  .stage { display: none; }
+  .stage.active {
+    display: block;
+    animation: fadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+  }
+
+  .kicker {
+    font-size: 0.68rem;
+    letter-spacing: 0.32em;
+    text-indent: 0.32em;
+    text-transform: uppercase;
+    color: #f0879f;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(1.45rem, 6vw, 1.8rem);
+    font-weight: 600;
+    line-height: 1.55;
+    letter-spacing: 0.02em;
+  }
+
+  .sub {
+    margin-top: 14px;
+    font-size: 0.9rem;
+    line-height: 1.95;
+    color: #9b8d94;
+  }
+
+  /* ---------- 按钮 ---------- */
+  .btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .btn {
+    font: inherit;
+    font-size: 0.93rem;
+    letter-spacing: 0.06em;
+    padding: 14px 30px;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    transition:
+      transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.3s ease,
+      background 0.3s ease,
+      color 0.3s ease;
+  }
+
+  .yes {
+    color: #fff;
+    background: linear-gradient(135deg, #ff96ac, #ff6b8a);
+    box-shadow: 0 12px 26px -10px rgba(255, 107, 138, 0.85);
+  }
+  .yes:hover { transform: translateY(-3px); }
+  .yes:active { transform: translateY(-1px) scale(0.98); }
+
+  .no {
+    color: #978a91;
+    background: #f6f2f3;
+  }
+  .no:hover { background: #efe9eb; }
+
+  .ghost {
+    color: #a2959c;
+    background: transparent;
+    border: 1px solid #ecdfe3;
+    padding: 12px 26px;
+  }
+  .ghost:hover { color: #ff6b8a; border-color: #ffc2cf; }
+
+  /* ---------- 成功画面 ---------- */
+  .heart {
+    font-size: 2.4rem;
+    line-height: 1;
+    color: #ff7d99;
+    margin-bottom: 18px;
+    animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: scale(0.4); }
+  }
+
+  .detail {
+    margin: 26px 0 30px;
+    border-top: 1px solid #f3eaec;
+    border-bottom: 1px solid #f3eaec;
+    padding: 4px 0;
+  }
+  .detail > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 4px;
+  }
+  .detail > div + div { border-top: 1px dashed #f6eef0; }
+  .detail dt {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    color: #b0a2a9;
+    flex: none;
+  }
+  .detail dd {
+    font-size: 0.94rem;
+    font-weight: 600;
+    color: #3b3336;
+    text-align: right;
+  }
+
+  /* ---------- 无障碍 ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    #hearts span { animation: none; opacity: 0; }
+    .stage.active, .heart { animation: none; }
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="hearts" aria-hidden="true"></div>
+
+<main class="card">
+
+  <!-- 第一步：发出邀请 -->
+  <section class="stage active" id="ask">
+    <p class="kicker">A Little Invitation</p>
+    <h1>这个周末<br />111</h1>
+    <p class="sub">111<br />111</p>
+
+    <div class="btns">
+      <button class="btn yes" id="yesBtn" type="button">好呀 ♡</button>
+      <button class="btn no" id="noBtn" type="button">下次吧</button>
+    </div>
+  </section>
+
+  <!-- 第二步：确认成功 -->
+  <section class="stage" id="done">
+    <div class="heart" aria-hidden="true">♡</div>
+    <h1>那就说定啦！</h1>
+    <p class="sub">我会准时出现的</p>
+
+    <dl class="detail">
+      <div>
+        <dt>时间</dt>
+        <dd>周六 · 下午 3:00</dd>
+      </div>
+      <div>
+        <dt>地点</dt>
+        <dd>老城咖啡馆</dd>
+      </div>
+    </dl>
+
+    <button class="btn ghost" id="backBtn" type="button">重新选择</button>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- 背景漂浮图案 ---------- */
+  var layer = document.getElementById('hearts');
+  var glyphs = ['♡', '♥', '❀', '✿'];
+  for (var i = 0; i < 10; i++) {
+    var s = document.createElement('span');
+    s.textContent = glyphs[i % glyphs.length];
+    s.style.left = (Math.random() * 100).toFixed(2) + '%';
+    s.style.fontSize = (14 + Math.random() * 22).toFixed(0) + 'px';
+    s.style.opacity = (0.35 + Math.random() * 0.45).toFixed(2);
+    s.style.animationDuration = (12 + Math.random() * 10).toFixed(1) + 's';
+    s.style.animationDelay = (-Math.random() * 22).toFixed(1) + 's';
+    layer.appendChild(s);
+  }
+
+  /* ---------- 画面切换 ---------- */
+  var ask = document.getElementById('ask');
+  var done = document.getElementById('done');
+  var yesBtn = document.getElementById('yesBtn');
+  var noBtn = document.getElementById('noBtn');
+  var backBtn = document.getElementById('backBtn');
+
+  function show(el) {
+    ask.classList.remove('active');
+    done.classList.remove('active');
+    el.classList.add('active');
+  }
+
+  yesBtn.addEventListener('click', function () { show(done); });
+  backBtn.addEventListener('click', function () { show(ask); });
+
+  /* ---------- “下次吧”越点越小 ---------- */
+  var noTexts = ['下次吧', '真的不要？', '再想想嘛', '好嘛…'];
+  var n = 0;
+
+  noBtn.addEventListener('click', function () {
+    n++;
+    if (n >= noTexts.length) {
+      noBtn.style.display = 'none';
+      return;
+    }
+    noBtn.textContent = noTexts[n];
+    noBtn.style.transform = 'scale(' + (1 - n * 0.1).toFixed(2) + ')';
+  });
+
+})();
+</script>
+</body>
+</html>
